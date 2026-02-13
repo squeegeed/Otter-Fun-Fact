@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Otter Fact</title>
+  <style>
+    :root { --card:#fff; --text:#111; --muted:#666; --border:#e9e9e9; }
+
+    
+    body{
+      margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #CCCCFF;
+
+      color: var(--text);
+    }
+
+    .wrap{ width:min(900px, 92vw); }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: 0 14px 42px rgba(0,0,0,.08);
+      overflow: hidden; /* important for sliding panels */
+    }
+
+    /* Slider */
+    .viewport{
+      width:100%;
+      overflow:hidden;
+    }
+    .track{
+      display:flex;
+      width:200%;            /* two panels */
+      transform: translateX(0%);
+      transition: transform 650ms cubic-bezier(.2,.8,.2,1);
+    }
+    .track.show-second{
+      transform: translateX(-50%); /* slide to panel 2 */
+    }
+
+    .panel{
+      width:50%;
+      padding: 22px;
+      box-sizing:border-box;
+    }
+
+    /* Panel 1 layout */
+    .top{
+      display:flex;
+      flex-direction: column;   /* stack vertically */
+      align-items: center;      /* center everything */
+      gap: 18px;
+    }
+
+    .funfact{
+      text-align: center;
+      max-width: 600px;
+    }
+    h1{ margin:0 0 8px; font-size: clamp(20px, 2.2vw, 28px); }
+    p{ margin: 0 0 10px; line-height:1.5; color: var(--muted); }
+
+    .quote{
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px dashed #d7c8ff;
+      background: #fbf9ff;
+      color:#2b1a55;
+      font-weight: 600;
+    }
+
+    .imgbox{
+      display:flex; flex-direction:column; gap:10px;
+      align-items:center;
+    }
+    img{
+      width: 100%;
+      max-width: 420px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 28px rgba(0,0,0,.10);
+      object-fit: cover;
+    }
+    .missing{
+      margin-top: 8px;
+      font-size: 16px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .actions{
+      margin-top: 18px;
+      display:flex; gap:12px; flex-wrap:wrap; justify-content:center;
+    }
+    button{
+      border: 1px solid var(--border);
+      background: #fff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 650;
+      transition: transform .08s ease, box-shadow .08s ease;
+    }
+    button:hover{ transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0,0,0,.08); }
+    .primary{ background:#111; color:#fff; border-color:#111; }
+
+    /* Panel 2 */
+    .panel2{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      min-height: 520px;
+      gap: 10px;
+    }
+    .panel2 h2{ margin:0; font-size: clamp(22px, 2.4vw, 32px); }
+    .panel2 .sub{ color: var(--muted); margin:0 0 10px; }
+    .hint{ margin-top: 6px; font-size: 13px; color: #888; }
+
+    /* Modal */
+    .backdrop{
+      position: fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background: rgba(0,0,0,.45);
+      padding: 18px;
+    }
+    .modal{
+      width: min(560px, 92vw);
+      background:#fff;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+      padding: 18px;
+      text-align:center;
+    }
+    .modal h2{ margin: 6px 0 10px; font-size: clamp(18px, 2vw, 24px); }
+    .modal p{ margin:0 0 14px; }
+    .btnrow{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  </style>
+</head>
+
+<audio id="bgMusic" src="Aperture.mp3" loop></audio>
+
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="viewport">
+        <div class="track" id="track">
+          <!-- PANEL 1 -->
+          <section class="panel">
+            <div class="top">
+              <div class="funfact">
+                <h1 id="headline">Quick fun fact 🦦</h1>
+                <div class="quote">
+                  did you know, otters are sentimental animals and often times have a favorite rock
+                </div>
+              </div>
+
+              <div class="imgbox">
+                <!-- change filenames here -->
+                <img id="rockImg" src="rock.png" alt="Floating rock" />
+                <div class="missing">hmm, something's missing from this picture…</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" id="askBtn">Reveal 👀</button>
+              <button id="restartBtn">Restart</button>
+            </div>
+          </section>
+
+          <!-- PANEL 2 -->
+          <section class="panel">
+            <div class="panel2">
+              <h2 id="yayTitle">cant wait lovebug, ill see you then 💖</h2>
+
+              <!-- change filename here -->
+              <img id="yesImg" src="yes.png" alt="A special picture" />
+
+              <div class="actions" style="margin-top:14px;">
+                <button id="backBtn">Back</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="backdrop" id="backdrop" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h2 id="questionText">christine, can i be the favorite rock to your otter this valentine?</h2>
+      <div class="btnrow">
+        <button class="primary" id="yesBtn">Yes 💘</button>
+        <button id="noBtn">No 🙈</button>
+      </div>
+      <p id="noMsg" style="display:none; margin-top:12px; color:#b00020; font-weight:650;">
+        what da hell . . . try again
+      </p>
+    </div>
+  </div>
+
+  <script>
+
+    const headline = document.getElementById("headline");
+    const questionText = document.getElementById("questionText");
+
+    const track = document.getElementById('track');
+    const askBtn = document.getElementById('askBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    const backdrop = document.getElementById('backdrop');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const noMsg = document.getElementById('noMsg');
+
+    const music = document.getElementById("bgMusic");
+    music.volume = 0.4; 
+
+
+    function openModal(){
+      noMsg.style.display = 'none';
+      backdrop.style.display = 'flex';
+    }
+    function closeModal(){
+      backdrop.style.display = 'none';
+    }
+    function goSecondPanel(){
+      closeModal();
+      track.classList.add('show-second');
+    }
+    function goFirstPanel(){
+      closeModal();
+      track.classList.remove('show-second');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    askBtn.addEventListener('click', () => {
+      music.play();
+      openModal();
+    });
+
+    restartBtn.addEventListener('click', goFirstPanel);
+    backBtn.addEventListener('click', goFirstPanel);
+
+    yesBtn.addEventListener('click', () => {
+      goSecondPanel();
+      celebrate();
+    });
+
+    function celebrate() {
+      for (let i = 0; i < 30; i++) {
+        const heart = document.createElement("div");
+        heart.textContent = "💖";
+        heart.style.position = "fixed";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.top = "-20px";
+        heart.style.fontSize = Math.random() * 20 + 20 + "px";
+        heart.style.animation = "fall 2s linear forwards";
+        document.body.appendChild(heart);
+
+        setTimeout(() => heart.remove(), 2000);
+      }
+    }
+
+const style = document.createElement("style");
+style.textContent = `
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}`;
+document.head.appendChild(style);
+
+
+    noBtn.addEventListener('click', () => {
+      noMsg.style.display = 'block';
+      // playful scoot
+      const dx = (Math.random() * 120) - 60;
+      const dy = (Math.random() * 60) - 30;
+      noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+      setTimeout(() => { noBtn.style.transform = ''; }, 250);
+    });
+
+    // Close modal if clicking outside
+    backdrop.addEventListener('click', (e) => {
+      if (e.target === backdrop) closeModal();
+    });
+
+    // ESC closes modal
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
